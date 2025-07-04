@@ -23,12 +23,12 @@ class PacienteController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombres' => 'required|string|max:255',
-            'apellidos' => 'nullable|string|max:255',
+            'nombres' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
+            'apellidos' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
             'tipo_documento_id' => 'required|exists:tipo_documentos,id',
             'numero_documento' => 'required|string|max:50|unique:pacientes',
-            'fecha_nacimiento' => 'nullable|date',
-            'sexo' => 'nullable|in:M,F',
+            'fecha_nacimiento' => 'nullable|date|before:today',
+            'sexo' => 'required|in:M,F',
             'direccion' => 'nullable|string|max:255',
             'telefono' => 'nullable|string|max:50',
         ]);
@@ -57,11 +57,11 @@ class PacienteController extends Controller
     {
         $rules= [];
         if ($request->has('nombres')) {
-            $rules['nombres'] = 'string|max:255';
+            $rules['nombres'] = 'string|max:255|regex:/^[\pL\s\-]+$/u';
         }
 
         if ($request->has('apellidos')) {
-            $rules['apellidos'] = 'string|max:255';
+            $rules['apellidos'] = 'string|max:255|regex:/^[\pL\s\-]+$/u';
         }
 
         if ($request->has('tipo_documento_id')) {
@@ -73,7 +73,7 @@ class PacienteController extends Controller
         }
 
         if ($request->has('fecha_nacimiento')) {
-            $rules['fecha_nacimiento'] = 'date';
+            $rules['fecha_nacimiento'] = 'date|before:today';
         }
 
         if ($request->has('sexo')) {

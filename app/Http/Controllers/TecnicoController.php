@@ -23,8 +23,8 @@ class TecnicoController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombres' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
+            'nombres' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
+            'apellidos' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
             'tipo_documento_id' => 'required|exists:tipo_documentos,id',
             'numero_documento' => 'required|string|max:50|unique:tecnicos',
         ]);
@@ -43,8 +43,8 @@ class TecnicoController extends Controller
     public function update(Request $request, Tecnico $tecnico)
     {
         $request->validate([
-            'nombres' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
+            'nombres' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
+            'apellidos' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
             'tipo_documento_id' => 'required|exists:tipo_documentos,id',
             'numero_documento' => 'required|string|max:50|unique:tecnicos,numero_documento,' . $tecnico->id,
         ]);
