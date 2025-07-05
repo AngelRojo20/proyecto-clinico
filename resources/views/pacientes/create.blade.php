@@ -19,17 +19,17 @@
 
         <div class="mb-3">
             <label for="nombres" class="form-label">Nombres</label>
-            <input type="text" class="form-control" id="nombres" name="nombres" required>
+            <input type="text" class="form-control" id="nombres" name="nombres">
         </div>
 
         <div class="mb-3">
             <label for="apellidos" class="form-label">Apellidos</label>
-            <input type="text" class="form-control" id="apellidos" name="apellidos" required>
+            <input type="text" class="form-control" id="apellidos" name="apellidos">
         </div>
 
         <div class="mb-3">
             <label for="tipo_documento_id" class="form-label">Tipo de Documento</label>
-            <select class="form-select" id="tipo_documento_id" name="tipo_documento_id" required>
+            <select class="form-select" id="tipo_documento_id" name="tipo_documento_id">
                 <option value="">Seleccione...</option>
                 @foreach($tiposDocumento as $tipo)
                     <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
@@ -39,7 +39,7 @@
 
         <div class="mb-3">
             <label for="numero_documento" class="form-label">Número de Documento</label>
-            <input type="text" class="form-control" id="numero_documento" name="numero_documento" required>
+            <input type="text" class="form-control" id="numero_documento" name="numero_documento">
         </div>
 
         <div class="mb-3">
