@@ -9,12 +9,20 @@ use App\Http\Requests\TecnicoForm;
 use App\UseCases\Contracts\Tecnicos\CreateInterface;
 use App\Http\Requests\TecnicoUpdateForm;
 use App\UseCases\Contracts\Tecnicos\UpdateInterface;
+use App\Repositories\Contracts\TecnicoRepositoryInterface;
 
 class TecnicoController extends Controller
 {
+    protected $tecnicoRepository;
+
+    public function __construct(TecnicoRepositoryInterface $tecnicoRepository)
+    {
+        $this->tecnicoRepository = $tecnicoRepository;
+    }
+
     public function index()
     {
-        $tecnicos = Tecnico::with('tipoDocumento')->get();
+        $tecnicos = $this->tecnicoRepository->all();
         return view('tecnicos.index', compact('tecnicos'));
     }
 
