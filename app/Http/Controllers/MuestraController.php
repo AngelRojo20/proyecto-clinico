@@ -12,12 +12,20 @@ use App\Http\Requests\MuestraForm;
 use App\UseCases\Contracts\Muestras\CreateInterface;
 use App\Http\Requests\MuestraUpdateForm;
 use App\UseCases\Contracts\Muestras\UpdateInterface;
+use App\Repositories\Contracts\MuestraRepositoryInterface;
 
 class MuestraController extends Controller
 {
+    protected $muestraRepository;
+
+    public function __construct(MuestraRepositoryInterface $muestraRepository)
+    {
+        $this->muestraRepository = $muestraRepository;
+    }
+
     public function index()
     {
-        $muestras = Muestra::with(['tipoMuestra', 'estado', 'paciente', 'tecnico'])->get();
+        $muestras = $this->muestraRepository->all();
         return view('muestras.index', compact('muestras'));
     }
 

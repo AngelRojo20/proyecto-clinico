@@ -56,5 +56,9 @@ class AppServiceProvider extends ServiceProvider
             \App\UseCases\Contracts\Muestras\UpdateInterface::class,
             \App\UseCases\Modules\Muestras\UpdateUseCases::class
         );
+        $this->app->bind(
+            \App\Repositories\Contracts\MuestraRepositoryInterface::class,
+            \App\Repositories\Modules\MuestraRepository::class
+        );
     }
 }
