@@ -29,5 +29,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\PacienteRepositoryInterface::class,
             \App\Repositories\Modules\PacienteRepository::class
         );
+
+        $this->app->bind(
+            \App\UseCases\Contracts\Pacientes\CreateInterface::class,
+            \App\UseCases\Modules\Pacientes\CreateUseCases::class
+        );
+
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Requests\PacienteForm;
 use Illuminate\Http\Request;
 use App\UseCases\Contracts\Pacientes\UpdateInterface;
 use App\Repositories\Contracts\PacienteRepositoryInterface;
+use App\UseCases\Contracts\Pacientes\CreateInterface;
 
 class PacienteController extends Controller
 {
@@ -30,19 +31,9 @@ class PacienteController extends Controller
         return view('pacientes.create', compact('tiposDocumento'));
     }
 
-    public function store(PacienteForm $request)
+    public function store(PacienteForm $request, CreateInterface $createUseCase)
     {
-        $paciente = Paciente::create([
-            'tipo_documento_id' => $request->tipo_documento_id,
-            'numero_documento' => $request->numero_documento,
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'sexo' => $request->sexo,
-            'direccion' => $request->direccion,
-            'telefono' => $request->telefono,
-        ]);
-
+        $createUseCase->handle($request);
         return redirect()->route('pacientes.index')->with('success', 'Paciente creado correctamente.');
     }
 
