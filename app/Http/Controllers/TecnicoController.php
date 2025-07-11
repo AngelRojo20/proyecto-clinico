@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Tecnico;
 use App\Models\TipoDocumento;
 use Illuminate\Http\Request;
+use App\Http\Requests\TecnicoForm;
+use App\UseCases\Contracts\Tecnicos\CreateInterface;
 
 class TecnicoController extends Controller
 {
@@ -20,17 +22,9 @@ class TecnicoController extends Controller
         return view('tecnicos.create', compact('tiposDocumento'));
     }
 
-    public function store(Request $request)
+    public function store(TecnicoForm $request, CreateInterface $createUseCase)
     {
-        $request->validate([
-            'nombres' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
-            'apellidos' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
-            'tipo_documento_id' => 'required|exists:tipo_documentos,id',
-            'numero_documento' => 'required|string|max:50|unique:tecnicos',
-        ]);
-
-        Tecnico::create($request->all());
-
+        $createUseCase->handle($request);
         return redirect()->route('tecnicos.index')->with('success', 'Técnico creado correctamente.');
     }
 

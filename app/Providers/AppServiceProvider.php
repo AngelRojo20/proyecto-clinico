@@ -35,5 +35,10 @@ class AppServiceProvider extends ServiceProvider
             \App\UseCases\Modules\Pacientes\CreateUseCases::class
         );
 
+        $this->app->bind(
+            \App\UseCases\Contracts\Tecnicos\CreateInterface::class,
+            \App\UseCases\Modules\Tecnicos\CreateUseCases::class
+        );
+
     }
 }
