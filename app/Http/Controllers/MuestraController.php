@@ -8,6 +8,10 @@ use App\Models\Estado;
 use App\Models\Paciente;
 use App\Models\Tecnico;
 use Illuminate\Http\Request;
+use App\Http\Requests\MuestraForm;
+use App\UseCases\Contracts\Muestras\CreateInterface;
+use App\Http\Requests\MuestraUpdateForm;
+use App\UseCases\Contracts\Muestras\UpdateInterface;
 
 class MuestraController extends Controller
 {
@@ -26,20 +30,9 @@ class MuestraController extends Controller
         return view('muestras.create', compact('tipos', 'estados', 'pacientes', 'tecnicos'));
     }
 
-    public function store(Request $request)
+    public function store(MuestraForm $request, CreateInterface $createUseCase)
     {
-        $request->validate([
-            'codigo' => 'required|string|unique:muestras',
-            'tipo_muestra_id' => 'required|exists:tipo_muestras,id',
-            'fecha_recoleccion' => 'required|date',
-            'estado_id' => 'required|exists:estados,id',
-            'paciente_id' => 'required|exists:pacientes,id',
-            'tecnico_id' => 'required|exists:tecnicos,id',
-            'observaciones' => 'nullable|string',
-        ]);
-
-        Muestra::create($request->all());
-
+        $createUseCase->handle($request);
         return redirect()->route('muestras.index')->with('success', 'Muestra creada correctamente.');
     }
 
@@ -52,20 +45,9 @@ class MuestraController extends Controller
         return view('muestras.edit', compact('muestra', 'tipos', 'estados', 'pacientes', 'tecnicos'));
     }
 
-    public function update(Request $request, Muestra $muestra)
+    public function update(MuestraUpdateForm $request, Muestra $muestra, UpdateInterface $updateUseCase)
     {
-        $request->validate([
-            'codigo' => 'required|string|unique:muestras,codigo,' . $muestra->id,
-            'tipo_muestra_id' => 'required|exists:tipo_muestras,id',
-            'fecha_recoleccion' => 'required|date',
-            'estado_id' => 'required|exists:estados,id',
-            'paciente_id' => 'required|exists:pacientes,id',
-            'tecnico_id' => 'required|exists:tecnicos,id',
-            'observaciones' => 'nullable|string',
-        ]);
-
-        $muestra->update($request->all());
-
+        $updateUseCase->handle($request, $muestra);
         return redirect()->route('muestras.index')->with('success', 'Muestra actualizada correctamente.');
     }
 
