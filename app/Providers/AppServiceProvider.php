@@ -40,5 +40,9 @@ class AppServiceProvider extends ServiceProvider
             \App\UseCases\Modules\Tecnicos\CreateUseCases::class
         );
 
+        $this->app->bind(
+            \App\UseCases\Contracts\Tecnicos\UpdateInterface::class,
+            \App\UseCases\Modules\Tecnicos\UpdateUseCases::class
+        );
     }
 }

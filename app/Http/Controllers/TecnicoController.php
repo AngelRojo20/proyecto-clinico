@@ -7,6 +7,8 @@ use App\Models\TipoDocumento;
 use Illuminate\Http\Request;
 use App\Http\Requests\TecnicoForm;
 use App\UseCases\Contracts\Tecnicos\CreateInterface;
+use App\Http\Requests\TecnicoUpdateForm;
+use App\UseCases\Contracts\Tecnicos\UpdateInterface;
 
 class TecnicoController extends Controller
 {
@@ -34,17 +36,9 @@ class TecnicoController extends Controller
         return view('tecnicos.edit', compact('tecnico', 'tiposDocumento'));
     }
 
-    public function update(Request $request, Tecnico $tecnico)
+    public function update(TecnicoUpdateForm $request, Tecnico $tecnico, UpdateInterface $updateUseCase)
     {
-        $request->validate([
-            'nombres' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
-            'apellidos' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
-            'tipo_documento_id' => 'required|exists:tipo_documentos,id',
-            'numero_documento' => 'required|string|max:50|unique:tecnicos,numero_documento,' . $tecnico->id,
-        ]);
-
-        $tecnico->update($request->all());
-
+        $updateUseCase->handle($request, $tecnico);
         return redirect()->route('tecnicos.index')->with('success', 'Técnico actualizado correctamente.');
     }
 
