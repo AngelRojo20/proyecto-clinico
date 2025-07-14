@@ -19,9 +19,14 @@ class PacienteController extends Controller
         $this->pacienteRepository = $pacienteRepository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $pacientes = $this->pacienteRepository->all();
+        $pacientes = $this->pacienteRepository->paginate(5);
+
+        if ($request->ajax()) {
+            return view('pacientes.partials.table', compact('pacientes'))->render();
+        }
+
         return view('pacientes.index', compact('pacientes'));
     }
 
@@ -33,8 +38,17 @@ class PacienteController extends Controller
 
     public function store(PacienteForm $request, CreateInterface $createUseCase)
     {
-        $createUseCase->handle($request);
-        return redirect()->route('pacientes.index')->with('success', 'Paciente creado correctamente.');
+        $paciente = $createUseCase->handle($request);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => 'Paciente creado correctamente.',
+                'paciente' => $paciente, // opcional, por si quieres usarlo
+            ], 201);
+        }
+
+        return redirect()->route('pacientes.index')
+            ->with('success', 'Paciente creado correctamente.');
     }
 
     public function edit(Paciente $paciente)
