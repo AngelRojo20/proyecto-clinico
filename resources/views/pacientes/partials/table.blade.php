@@ -8,12 +8,11 @@
             <th>Sexo</th>
             <th>Dirección</th>
             <th>Teléfono</th>
-            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
         @foreach($pacientes as $paciente)
-            <tr>
+            <tr class="fila-paciente" data-id="{{ $paciente->id }}">
                 <td>{{ $paciente->nombres }} {{ $paciente->apellidos }}</td>
                 <td>{{ $paciente->tipoDocumento->nombre }}</td>
                 <td>{{ $paciente->numero_documento }}</td>
@@ -21,14 +20,6 @@
                 <td>{{ $paciente->sexo }}</td>
                 <td>{{ $paciente->direccion }}</td>
                 <td>{{ $paciente->telefono }}</td>
-                <td>
-                    <a href="{{ route('pacientes.edit', $paciente) }}" class="btn btn-warning btn-sm">Editar</a>
-                    <form action="{{ route('pacientes.destroy', $paciente) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" onclick="return confirm('¿Estás seguro?')" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
             </tr>
         @endforeach
     </tbody>

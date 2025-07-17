@@ -59,7 +59,7 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary">Guardar</button>
+    <div class="d-flex gap-2 mt-3 justify-content-start">
+        <x-form-buttons />
     </div>
 </form>

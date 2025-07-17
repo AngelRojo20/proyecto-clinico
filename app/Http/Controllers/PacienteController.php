@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\UseCases\Contracts\Pacientes\UpdateInterface;
 use App\Repositories\Contracts\PacienteRepositoryInterface;
 use App\UseCases\Contracts\Pacientes\CreateInterface;
+use App\UseCases\Contracts\Pacientes\ShowInterface;
 
 class PacienteController extends Controller
 {
@@ -58,6 +59,11 @@ class PacienteController extends Controller
         return view('pacientes.edit', compact('paciente', 'tiposDocumento'));
     }
 
+    public function show(Paciente $paciente, ShowInterface $showUseCase)
+    {
+        return response()->json($showUseCase->handle($paciente));
+    }
+
     public function update(Request $request, Paciente $paciente, UpdateInterface $updateUseCase)
     {
         $updateUseCase->handle($request, $paciente);
@@ -67,6 +73,10 @@ class PacienteController extends Controller
     public function destroy(Paciente $paciente)
     {
         $paciente->delete();
+
+        if (request()->ajax()) {
+            return response()->json(['message' => 'Paciente eliminado correctamente.']);
+        }
 
         return redirect()->route('pacientes.index')->with('success', 'Paciente eliminado correctamente.');
     }

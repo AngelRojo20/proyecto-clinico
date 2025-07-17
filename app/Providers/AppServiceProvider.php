@@ -3,6 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\UseCases\Contracts\Pacientes\ShowInterface;
+use App\UseCases\Modules\Pacientes\ShowUseCases;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(ShowInterface::class, ShowUseCases::class);
     }
 
     /**
