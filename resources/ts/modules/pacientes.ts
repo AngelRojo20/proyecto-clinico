@@ -3,29 +3,48 @@ import $ from 'jquery';
 console.log('📦 pacientes.ts cargado');
 
 
+// Asegura que Laravel identifique la petición como AJAX
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
 $(document).ready(() => {
     // Envío de formulario
     $('#form-create-paciente').on('submit', function (e) {
         e.preventDefault();
 
         const data = {
-            nombre: $('#nombre').val(),
-            apellido: $('#apellido').val(),
-            email: $('#email').val(),
+            nombres: $('#nombres').val(),
+            apellidos: $('#apellidos').val(),
+            tipo_documento_id: $('#tipo_documento_id').val(),
+            numero_documento: $('#numero_documento').val(),
+            fecha_nacimiento: $('#fecha_nacimiento').val(),
+            sexo: $('#sexo').val(),
+            direccion: $('#direccion').val(),
+            telefono: $('#telefono').val(),
         };
 
         axios.post('/pacientes', data)
             .then(response => {
-                $('#mensaje').html('<p>Paciente creado correctamente</p>');
+                mostrarSnackbar('Paciente creado correctamente', 'success');
                 ($('#form-create-paciente')[0] as HTMLFormElement).reset();
-                console.log('✅ Respuesta recibida:', response.data);
+
+                //Recargar la tabla de pacientes via AJAX
+                $.ajax({
+                    url: '/pacientes',
+                    type: 'GET',
+                    success: function (html) {
+                        $('#pacientes-content').html(html);
+                    },
+                    error: function (err) {
+                        console.error('❌ Error al recargar pacientes', err);
+                    }
+                });
             })
             .catch(error => {
                 if (error.response && error.response.status === 422) {
                     const errores = error.response.data.errors;
                     const mensajes = Object.values(errores)
                         .map((e: any) => `<li>${e}</li>`).join('');
-                    $('#mensaje').html(`<ul>${mensajes}</ul>`);
+                    mostrarSnackbar(mensajes, 'danger');
                 } else {
                     console.error('Error desconocido', error);
                 }
@@ -53,4 +72,23 @@ $(document).ready(() => {
             });
         }
     });
+
+    function mostrarSnackbar(mensaje: string, tipo: 'success' | 'danger' | 'info' | 'warning' = 'success'): void {
+        const snackbar = $('#snackbar');
+        const snackbarText = $('#snackbar-text');
+
+        // Quitar clases anteriores y aplicar la clase correspondiente al tipo
+        snackbar
+            .removeClass('d-none bg-success bg-danger bg-info bg-warning')
+            .addClass(`bg-${tipo}`)
+            .fadeIn(300);
+
+        snackbarText.text(mensaje);
+
+        // Ocultar después de 3 segundos
+        setTimeout(() => {
+            snackbar.fadeOut(500, () => snackbar.addClass('d-none'));
+        }, 3000);
+    }
+
 });

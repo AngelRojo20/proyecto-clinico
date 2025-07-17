@@ -22,12 +22,13 @@ class PacienteController extends Controller
     public function index(Request $request)
     {
         $pacientes = $this->pacienteRepository->paginate(5);
+        $tiposDocumento = TipoDocumento::all();
 
         if ($request->ajax()) {
             return view('pacientes.partials.table', compact('pacientes'))->render();
         }
 
-        return view('pacientes.index', compact('pacientes'));
+        return view('pacientes.index', compact('pacientes', 'tiposDocumento'));
     }
 
     public function create()
@@ -43,7 +44,7 @@ class PacienteController extends Controller
         if ($request->ajax()) {
             return response()->json([
                 'message' => 'Paciente creado correctamente.',
-                'paciente' => $paciente, // opcional, por si quieres usarlo
+                'paciente' => $paciente,
             ], 201);
         }
 
