@@ -26,6 +26,8 @@ $(document).ready(() => {
             .then(response => {
                 mostrarSnackbar('Paciente creado correctamente', 'success');
                 ($('#form-create-paciente')[0] as HTMLFormElement).reset();
+                $('[id^="error-"]').html('');
+
 
                 //Recargar la tabla de pacientes via AJAX
                 $.ajax({
@@ -41,12 +43,19 @@ $(document).ready(() => {
             })
             .catch(error => {
                 if (error.response && error.response.status === 422) {
+                    mostrarSnackbar('Por favor, complete los campos requeridos.', 'danger');
                     const errores = error.response.data.errors;
-                    const mensajes = Object.values(errores)
-                        .map((e: any) => `<li>${e}</li>`).join('');
-                    mostrarSnackbar(mensajes, 'danger');
+
+                    // Limpiar errores anteriores
+                    $('[id^="error-"]').html('');
+
+                    Object.entries(errores).forEach(([campo, mensajes]: [string, string[]]) => {
+                        const mensaje = mensajes[0]; // Solo mostramos el primero
+                        $(`#error-${campo}`).html(mensaje);
+                    });
                 } else {
                     console.error('Error desconocido', error);
+                    mostrarSnackbar('Ocurrió un error inesperado. Intente nuevamente.', 'danger');
                 }
             });
     });

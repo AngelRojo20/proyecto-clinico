@@ -26,10 +26,10 @@ class PacienteForm extends FormRequest
             'apellidos' => 'required|string|max:255|regex:/^[\pL\s\-]+$/u',
             'tipo_documento_id' => 'required|exists:tipo_documentos,id',
             'numero_documento' => 'required|string|max:50|unique:pacientes',
-            'fecha_nacimiento' => 'nullable|date|before:today',
+            'fecha_nacimiento' => 'required|date|before:today',
             'sexo' => 'required|in:M,F',
-            'direccion' => 'nullable|string|max:255',
-            'telefono' => 'nullable|string|max:50',
+            'direccion' => 'required|string|max:255',
+            'telefono' => 'required|string|max:50',
         ];
     }
 }
