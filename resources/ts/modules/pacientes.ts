@@ -1,58 +1,39 @@
 import axios from 'axios';
 import $ from 'jquery';
 import { mostrarSnackbar } from '../utils/snackbar';
+import {
+    obtenerDatosFormulario,
+    mostrarErroresValidacion,
+    resetearFormulario,
+    recargarContenidoAjax
+} from '../utils/formUtils';
+
 console.log('📦 pacientes.ts cargado');
 
-
-// Asegura que Laravel identifique la petición como AJAX
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-$(document).ready(() => {
+$(() => {
+    const camposPaciente = [
+        'nombres', 'apellidos', 'tipo_documento_id', 'numero_documento',
+        'fecha_nacimiento', 'sexo', 'direccion', 'telefono'
+    ];
+
     // Envío de formulario
     $('#form-create-paciente').on('submit', function (e) {
         e.preventDefault();
 
-        const data = {
-            nombres: $('#nombres').val(),
-            apellidos: $('#apellidos').val(),
-            tipo_documento_id: $('#tipo_documento_id').val(),
-            numero_documento: $('#numero_documento').val(),
-            fecha_nacimiento: $('#fecha_nacimiento').val(),
-            sexo: $('#sexo').val(),
-            direccion: $('#direccion').val(),
-            telefono: $('#telefono').val(),
-        };
+        const data = obtenerDatosFormulario(camposPaciente);
 
         axios.post('/pacientes', data)
-            .then(response => {
+            .then(() => {
                 mostrarSnackbar('Paciente creado correctamente', 'success');
-                ($('#form-create-paciente')[0] as HTMLFormElement).reset();
-
-
-                //Recargar la tabla de pacientes via AJAX
-                $.ajax({
-                    url: '/pacientes',
-                    type: 'GET',
-                    success: function (html) {
-                        $('#pacientes-content').html(html);
-                    },
-                    error: function (err) {
-                        console.error('❌ Error al recargar pacientes', err);
-                    }
-                });
+                resetearFormulario('#form-create-paciente');
+                recargarContenidoAjax('#pacientes-content', '/pacientes');
             })
             .catch(error => {
                 if (error.response && error.response.status === 422) {
                     mostrarSnackbar('Por favor, complete los campos requeridos.', 'danger');
-                    const errores = error.response.data.errors;
-
-                    // Limpiar errores anteriores
-                    $('[id^="error-"]').html('');
-
-                    Object.entries(errores).forEach(([campo, mensajes]: [string, string[]]) => {
-                        const mensaje = mensajes[0]; // Solo mostramos el primero
-                        $(`#error-${campo}`).html(mensaje);
-                    });
+                    mostrarErroresValidacion(error.response.data.errors);
                 } else {
                     console.error('Error desconocido', error);
                     mostrarSnackbar('Ocurrió un error inesperado. Intente nuevamente.', 'danger');
@@ -85,19 +66,16 @@ $(document).ready(() => {
     // Manejo de eventos para editar y eliminar pacientes
     let pacienteSeleccionadoId: number | null = null;
 
-    // Referencias a botones
     const $btnGuardar = $('#btn-guardar');
     const $btnModificar = $('#btn-modificar');
     const $btnEliminar = $('#btn-eliminar');
     const $btnLimpiar = $('#btn-limpiar');
 
-    // Estado inicial de botones
     $btnModificar.prop('disabled', true);
     $btnEliminar.prop('disabled', true);
 
-    // Función para limpiar formulario
     function limpiarFormulario() {
-        $('#form-create-paciente')[0].reset();
+        resetearFormulario('#form-create-paciente');
         pacienteSeleccionadoId = null;
         $btnGuardar.text('Guardar').data('accion', 'crear');
         $btnModificar.prop('disabled', true);
@@ -105,7 +83,6 @@ $(document).ready(() => {
         $('.fila-paciente').removeClass('table-active');
     }
 
-    // Click sobre fila de paciente
     $(document).on('click', '.fila-paciente', function () {
         const id = $(this).data('id');
         if (!id) return;
@@ -119,6 +96,7 @@ $(document).ready(() => {
             .then(response => {
                 const paciente = response.data;
 
+                //Cambiar por el Serialize
                 $('#nombres').val(paciente.nombres);
                 $('#apellidos').val(paciente.apellidos);
                 $('#tipo_documento_id').val(paciente.tipo_documento_id);
@@ -136,35 +114,21 @@ $(document).ready(() => {
             });
     });
 
-    // Click en Modificar → activa modo edición
     $btnModificar.on('click', () => {
         $btnGuardar.text('Actualizar').data('accion', 'editar').prop('disabled', false);
     });
 
-    // Click en Limpiar → limpia y resetea
     $btnLimpiar.on('click', () => {
         limpiarFormulario();
     });
 
-    // Click en Guardar o Actualizar
     $btnGuardar.on('click', function (e) {
         e.preventDefault();
 
-        const data = {
-            nombres: $('#nombres').val(),
-            apellidos: $('#apellidos').val(),
-            tipo_documento_id: $('#tipo_documento_id').val(),
-            numero_documento: $('#numero_documento').val(),
-            fecha_nacimiento: $('#fecha_nacimiento').val(),
-            sexo: $('#sexo').val(),
-            direccion: $('#direccion').val(),
-            telefono: $('#telefono').val(),
-        };
-
+        const data = obtenerDatosFormulario(camposPaciente);
         const accion = $(this).data('accion') || 'crear';
         const url = accion === 'editar' ? `/pacientes/${pacienteSeleccionadoId}` : '/pacientes';
 
-        // Para edición, usamos POST con _method='PUT'
         const payload = { ...data };
         if (accion === 'editar') {
             payload['_method'] = 'PUT';
@@ -174,16 +138,12 @@ $(document).ready(() => {
             .then(() => {
                 mostrarSnackbar(`Paciente ${accion === 'editar' ? 'actualizado' : 'creado'} correctamente`, 'success');
                 limpiarFormulario();
-                recargarPacientes();
+                recargarContenidoAjax('#pacientes-content', '/pacientes');
             })
             .catch(error => {
                 if (error.response?.status === 422) {
                     mostrarSnackbar('Por favor, complete los campos requeridos.', 'danger');
-                    const errores = error.response.data.errors;
-                    $('[id^="error-"]').html('');
-                    Object.entries(errores).forEach(([campo, mensajes]: [string, string[]]) => {
-                        $(`#error-${campo}`).html(mensajes[0]);
-                    });
+                    mostrarErroresValidacion(error.response.data.errors);
                 } else {
                     console.error('Error desconocido', error);
                     mostrarSnackbar('Ocurrió un error inesperado.', 'danger');
@@ -191,36 +151,19 @@ $(document).ready(() => {
             });
     });
 
-    // Eliminar paciente
     $btnEliminar.on('click', () => {
         if (!pacienteSeleccionadoId) return;
-
         if (!confirm('¿Deseas eliminar este paciente?')) return;
 
         axios.delete(`/pacientes/${pacienteSeleccionadoId}`)
             .then(() => {
                 mostrarSnackbar('Paciente eliminado correctamente.', 'success');
                 limpiarFormulario();
-                recargarPacientes();
+                recargarContenidoAjax('#pacientes-content', '/pacientes');
             })
             .catch(error => {
                 console.error('❌ Error al eliminar paciente', error);
                 mostrarSnackbar('No se pudo eliminar el paciente.', 'danger');
             });
     });
-
-    // Reutilizar recarga de la tabla
-    function recargarPacientes() {
-        $.ajax({
-            url: '/pacientes',
-            type: 'GET',
-            success: function (html) {
-                $('#pacientes-content').html(html);
-            },
-            error: function (err) {
-                console.error('❌ Error al recargar pacientes', err);
-            }
-        });
-    }
-
 });
