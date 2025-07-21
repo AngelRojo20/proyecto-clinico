@@ -56,3 +56,24 @@ export function recargarContenidoAjax(selector: string, url: string) {
         }
     });
 }
+
+/**
+ * Deshabilita todos los campos editables dentro de un formulario.
+ * Excluye botones, botones de tipo submit/reset y campos ocultos.
+ * @param selector ID del formulario (ej: '#form-create-paciente')
+ */
+export function bloquearInputsFormulario(selector: string) {
+    $(`${selector} input, ${selector} select, ${selector} textarea`)
+        .not(':button, [type="submit"], [type="reset"], [type="hidden"]')
+        .prop('disabled', true);
+}
+
+/**
+ * Habilita todos los campos editables dentro de un formulario.
+ * @param selector ID del formulario (ej: '#form-create-paciente')
+ */
+export function desbloquearInputsFormulario(selector: string) {
+    $(`${selector} input, ${selector} select, ${selector} textarea`)
+        .not(':button, [type="submit"], [type="reset"], [type="hidden"]')
+        .prop('disabled', false);
+}

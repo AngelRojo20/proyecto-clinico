@@ -5,8 +5,16 @@ import {
     obtenerDatosFormulario,
     mostrarErroresValidacion,
     resetearFormulario,
-    recargarContenidoAjax
+    recargarContenidoAjax,
+    bloquearInputsFormulario,
+    desbloquearInputsFormulario
 } from '../utils/formUtils';
+import {
+    establecerEstadoInicialBotones,
+    establecerEstadoConRegistroSeleccionado,
+    activarModoEdicion
+} from '../utils/buttonStates';
+
 
 console.log('📦 pacientes.ts cargado');
 
@@ -71,15 +79,14 @@ $(() => {
     const $btnEliminar = $('#btn-eliminar');
     const $btnLimpiar = $('#btn-limpiar');
 
-    $btnModificar.prop('disabled', true);
-    $btnEliminar.prop('disabled', true);
+    establecerEstadoInicialBotones($btnGuardar, $btnModificar, $btnEliminar);
+
 
     function limpiarFormulario() {
+        establecerEstadoInicialBotones($btnGuardar, $btnModificar, $btnEliminar);
         resetearFormulario('#form-create-paciente');
+        desbloquearInputsFormulario('#form-create-paciente');
         pacienteSeleccionadoId = null;
-        $btnGuardar.text('Guardar').data('accion', 'crear');
-        $btnModificar.prop('disabled', true);
-        $btnEliminar.prop('disabled', true);
         $('.fila-paciente').removeClass('table-active');
     }
 
@@ -106,8 +113,8 @@ $(() => {
                 $('#direccion').val(paciente.direccion);
                 $('#telefono').val(paciente.telefono);
 
-                $btnModificar.prop('disabled', false);
-                $btnEliminar.prop('disabled', false);
+                bloquearInputsFormulario('#form-create-paciente');
+                establecerEstadoConRegistroSeleccionado($btnGuardar, $btnModificar, $btnEliminar);
             })
             .catch(error => {
                 console.error('❌ Error al obtener paciente', error);
@@ -115,7 +122,8 @@ $(() => {
     });
 
     $btnModificar.on('click', () => {
-        $btnGuardar.text('Actualizar').data('accion', 'editar').prop('disabled', false);
+        activarModoEdicion($btnGuardar, $btnModificar, $btnEliminar);
+        desbloquearInputsFormulario('#form-create-paciente');
     });
 
     $btnLimpiar.on('click', () => {
