@@ -12,7 +12,7 @@
     </thead>
     <tbody>
         @foreach($pacientes as $paciente)
-            <tr class="fila-paciente" data-id="{{ $paciente->id }}">
+            <tr class="fila-paciente fila-interactiva" data-id="{{ $paciente->id }}">
                 <td>{{ $paciente->nombres }} {{ $paciente->apellidos }}</td>
                 <td>{{ $paciente->tipoDocumento->nombre }}</td>
                 <td>{{ $paciente->numero_documento }}</td>

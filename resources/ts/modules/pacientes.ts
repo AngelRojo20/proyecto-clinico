@@ -83,7 +83,7 @@ $(() => {
         $('.fila-paciente').removeClass('table-active');
     }
 
-    $(document).on('click', '.fila-paciente', function () {
+    $(document).on('dblclick', '.fila-paciente', function () {
         const id = $(this).data('id');
         if (!id) return;
 
